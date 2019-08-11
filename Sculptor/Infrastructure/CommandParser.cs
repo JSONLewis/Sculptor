@@ -1,21 +1,19 @@
-﻿using CommandLine;
+﻿using System.Diagnostics;
+using CommandLine;
 using Sculptor.Core;
-using Sculptor.Core.ConsoleAbstractions;
+using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor.Infrastructure
 {
     public sealed class CommandParser : ICommandParser
     {
-        private readonly ITerminal _console;
         private readonly ICommandProcessor _commandProcessor;
         private readonly IRegisteredVerbs _registeredVerbs;
 
         public CommandParser(
-            ITerminal console,
             ICommandProcessor commandProcessor,
             IRegisteredVerbs registeredVerbs)
         {
-            _console = console;
             _commandProcessor = commandProcessor;
             _registeredVerbs = registeredVerbs;
         }
@@ -32,6 +30,10 @@ namespace Sculptor.Infrastructure
 
                 if (parsedCommand != null)
                 {
+                    // Make the raw parse result available to any part of the program
+                    // that takes a dependency on the Singleton `IUserInput`.
+                    userInput.ParsedCommand = result;
+
                     _commandProcessor.Process(parsedCommand);
                     return;
                 }
@@ -42,7 +44,9 @@ namespace Sculptor.Infrastructure
 
         private void HandleFailedParsing(IUserInput userInput)
         {
-            _console.RenderText($"Failure processing `{userInput.Raw}`. Now invoking {nameof(HandleFailedParsing)}");
+            // TODO: replace this with a call to a logger so that we record this
+            // information on disk.
+            Trace.WriteLine($"Failure processing `{userInput.Raw}`. Now invoking {nameof(HandleFailedParsing)}");
         }
     }
 }

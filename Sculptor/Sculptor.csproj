@@ -8,10 +8,14 @@
   <ItemGroup>
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
     <PackageReference Include="System.IO.Abstractions" Version="6.0.17" />
+    <PackageReference Include="CommandLineParser" Version="2.6.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sculptor.Core\Sculptor.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ValidationFormatters\" />
+  </ItemGroup>
 </Project>

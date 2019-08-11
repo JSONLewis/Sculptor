@@ -1,4 +1,4 @@
-﻿using Sculptor.Core.ConsoleAbstractions;
+﻿using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor
 {

@@ -1,4 +1,6 @@
-﻿using Sculptor.Core.ConsoleAbstractions;
+﻿using FluentValidation;
+using Sculptor.Infrastructure.ConsoleAbstractions;
+using Sculptor.ValidationFormatters;
 using System;
 
 namespace Sculptor
@@ -9,36 +11,57 @@ namespace Sculptor
         {
 #if DEBUG
             // Valid Command using default name.
-            //args = SplitArguments("create -n \"MyFirstProject\" -o \"public\"");
+            args = SplitArguments("create -n \"MyFirstProject\"");
 
             // Valid Command using non-default name.
             //args = SplitArguments("create -n \"MyFirstProject\" -o \"site\"");
 
-            // Valid Command using the default value for the name.
-            args = SplitArguments("create -n \"MyFirstProject\"");
+            // Invalid Command with no value provided for the name.
+            //args = SplitArguments("create -n");
 
             // Invalid Command Argument.
             //args = SplitArguments("create -n \"MyFirstProject\" -o \"public\" --invalidOption");
 
             // Invalid Command Verb.
             //args = SplitArguments("invalidverb -t");
-#endif
+#endif         
 
-            var app = Bootstrapper.InitialiseApplication();
-
-            var command = new UserInput
+            try
             {
-                Arguments = args
-            };
+                Bootstrapper.InitialiseApplication();
+                var app = Bootstrapper.GetInstance<IApplication>();
 
-            // TODO: add in an exception handler so that OSs like OSX do not show a
-            // failure pop up etc when an intended exception is thrown.
-            // These should return a failure exit code and write to STDERR but non zero.
-            // This way the user still gets informed of what went wrong - but we don't
-            // treat this as severly as a genuine unexpected failure.
-            // To this end all exceptions thrown intentionally should be a ValidationException
-            // anything else should fall back to the OS's specific way of handling crashes.
-            app.Run(command);
+                var command = Bootstrapper.GetInstance<IUserInput>();
+                command.Arguments = args;
+
+                app.Run(command);
+            }
+            catch (ValidationException e)
+            {
+                var validationFormatter = Bootstrapper
+                    .GetInstance<IFluentValidationFormatter>();
+
+                // TODO: serialise this object and log the full thing to file.
+                var groupedErrors = validationFormatter.GroupExceptionsByName(e.Errors);
+
+                // TODO: look into a way of better highlighting errors in a cross platform
+                // compliant way. Should they be in a different colour etc?
+                var terminal = Bootstrapper.GetInstance<ITerminal>();
+                var templateBuilder = Bootstrapper.GetInstance<ITemplateBuilder>();
+
+                string message = groupedErrors.FormatPrimaryErrorMessages();
+                string template = templateBuilder.BuildErrorTemplate(message);
+
+                // TODO: look into a verbose flag for controlling how much information
+                // should be shown.
+                terminal.RenderText(template);
+            }
+            catch (Exception e)
+            {
+                // TODO: try to log as much information as possible before letting this
+                // bubble up. For now pretend we're doing something extra.
+                throw e;
+            }
         }
 
         private static string[] SplitArguments(string rawInput)

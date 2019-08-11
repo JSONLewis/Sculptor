@@ -1,5 +1,5 @@
-﻿using Sculptor.Core.ConsoleAbstractions;
-using Sculptor.Infrastructure;
+﻿using Sculptor.Infrastructure;
+using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor
 {

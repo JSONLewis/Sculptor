@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sculptor.Core.ConsoleAbstractions
+namespace Sculptor.Infrastructure.ConsoleAbstractions
 {
     public sealed class Terminal : ITerminal
     {

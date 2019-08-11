@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using CommandLine;
 
-namespace Sculptor.Core.ConsoleAbstractions
+namespace Sculptor.Infrastructure.ConsoleAbstractions
 {
     public interface IUserInput
     {
@@ -10,5 +11,7 @@ namespace Sculptor.Core.ConsoleAbstractions
         ICollection<string> Arguments { get; set; }
 
         DateTime SubmittedOn { get; }
+
+        ParserResult<object> ParsedCommand { get; set; }
     }
 }

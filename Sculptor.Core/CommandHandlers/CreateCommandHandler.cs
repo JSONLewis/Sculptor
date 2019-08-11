@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Text;
 using Sculptor.Core.Commands;
-using Sculptor.Core.ConsoleAbstractions;
+using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor.Core.CommandHandlers
 {
@@ -11,50 +11,23 @@ namespace Sculptor.Core.CommandHandlers
     {
         private readonly ITerminal _console;
         private readonly IFileSystem _fileSystem;
-        private readonly IReservedDirectories _reservedDirectories;
 
         public CreateCommandHandler(
             ITerminal console,
-            IFileSystem fileSystem,
-            IReservedDirectories reservedDirectories)
+            IFileSystem fileSystem)
         {
             _console = console;
             _fileSystem = fileSystem;
-            _reservedDirectories = reservedDirectories;
         }
 
         public void Handle(CreateCommand command)
         {
+            // TODO: add messages like this to a log instead of Stdout. (Maybe we would
+            // want to do something like this in a 'verbose' mode though).
             _console.RenderText($"Succesfully called the {nameof(Handle)} method of {nameof(CreateCommandHandler)}");
-
-            if (command is null)
-                throw new ArgumentException($"The `Create` command has been incorrectly invoked with a null argument instance");
-
-            // TODO: look into abstracting validation out of the handler.
-            if (command.OutputDirectoryName?.IndexOfAny(_fileSystem.Path.GetInvalidPathChars()) != -1)
-                throw new ArgumentException($"Invalid path character(s) provided for: {nameof(command.OutputDirectoryName)}");
-
-            if (command.ProjectName?.IndexOfAny(_fileSystem.Path.GetInvalidPathChars()) != -1)
-                throw new ArgumentException($"Invalid path character(s) provided for: {nameof(command.ProjectName)}");
 
             string projectRootPath = _fileSystem.Path.Combine(Environment.CurrentDirectory, command.ProjectName);
 
-            if (_fileSystem.Directory.Exists(projectRootPath))
-                throw new ArgumentException($"A Sculptor project already exists in the provided directory: `{command.ProjectName}`");
-
-            if (command.OutputDirectoryName != ReservedDirectories.OutputDirectoryName
-                && _reservedDirectories.IsDirectoryNameReserved(command.OutputDirectoryName))
-            {
-                throw new ArgumentException($"The value provided for: {nameof(command.OutputDirectoryName)} is reserved for internal use by Sculptor");
-            }
-
-            CreateProjectStructureOnDisk(projectRootPath, command);
-        }
-
-        #region Helpers
-
-        private void CreateProjectStructureOnDisk(string projectRootPath, CreateCommand command)
-        {
             string outputPath = _fileSystem.Path.Combine(
                 projectRootPath,
                 command.OutputDirectoryName);
@@ -83,8 +56,5 @@ namespace Sculptor.Core.CommandHandlers
             _console.RenderText("Successfully created a Sculptor project on disk.");
             _console.RenderText($"The project root can be found at: `{projectRootPath}`");
         }
-
-        #endregion
-
     }
 }

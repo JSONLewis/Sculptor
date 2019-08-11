@@ -1,4 +1,4 @@
-﻿namespace Sculptor.Core.ConsoleAbstractions
+﻿namespace Sculptor.Infrastructure.ConsoleAbstractions
 {
     public interface ITerminal
     {
