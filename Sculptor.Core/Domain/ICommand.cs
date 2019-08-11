@@ -1,4 +1,4 @@
-﻿namespace Sculptor.Core.Commands
+﻿namespace Sculptor.Core.Domain
 {
     public interface ICommand
     {

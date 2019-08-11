@@ -11,7 +11,8 @@
 
   <ItemGroup>
     <Folder Include="CrossCuttingConcerns\" />
-    <Folder Include="Validators\" />
+    <Folder Include="Domain\" />
+    <Folder Include="Domain\Create\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sculptor.Infrastructure\Sculptor.Infrastructure.csproj" />

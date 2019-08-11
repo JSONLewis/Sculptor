@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO.Abstractions;
 using FluentValidation;
-using Sculptor.Core.Commands;
 
-namespace Sculptor.Core.Validators
+namespace Sculptor.Core.Domain.Create
 {
     public class CreateCommandValidator : AbstractValidator<CreateCommand>
     {

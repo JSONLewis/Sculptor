@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using Sculptor.Core.CommandHandlers;
-using Sculptor.Core.Commands;
+using Sculptor.Core.Domain;
 
 namespace Sculptor.Core
 {

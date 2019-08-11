@@ -2,7 +2,7 @@
 
 namespace Sculptor.Infrastructure
 {
-    public interface ICommandParser
+    internal interface ICommandParser
     {
         void Parse(IUserInput userInput);
     }

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Sculptor.Core;
-using Sculptor.Core.CommandHandlers;
+using Sculptor.Core.Domain;
 using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.ValidationFormatters;

@@ -5,7 +5,7 @@ using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor.Infrastructure
 {
-    public sealed class CommandParser : ICommandParser
+    internal sealed class CommandParser : ICommandParser
     {
         private readonly ICommandProcessor _commandProcessor;
         private readonly IRegisteredVerbs _registeredVerbs;

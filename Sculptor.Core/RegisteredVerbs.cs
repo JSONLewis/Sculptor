@@ -1,7 +1,7 @@
-﻿using Sculptor.Core.Commands;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+using Sculptor.Core.Domain;
 
 namespace Sculptor.Core
 {
@@ -12,11 +12,13 @@ namespace Sculptor.Core
             var commandType = typeof(ICommand);
 
             string restrictedNamespace
-                = $"{nameof(Sculptor)}.{nameof(Core)}.{nameof(Commands)}";
+                = $"{nameof(Sculptor)}.{nameof(Core)}.{nameof(Domain)}";
 
             var types = from type in Assembly.GetExecutingAssembly().GetTypes()
                         where type.IsClass
-                          && type.Namespace == restrictedNamespace
+                          && type.Namespace.StartsWith(
+                              restrictedNamespace,
+                              StringComparison.Ordinal)
                           && typeof(ICommand).IsAssignableFrom(type)
                         select type;
 

@@ -1,6 +1,4 @@
-﻿using Sculptor.Core.Commands;
-
-namespace Sculptor.Core.CommandHandlers
+﻿namespace Sculptor.Core.Domain
 {
     public interface ICommandHandler<TCommand> where TCommand : class, ICommand
     {

@@ -3,8 +3,6 @@ using System.IO.Abstractions.TestingHelpers;
 using Moq;
 using NUnit.Framework;
 using Sculptor.Core;
-using Sculptor.Core.CommandHandlers;
-using Sculptor.Core.Commands;
 
 namespace Sculptor.Tests.CommandHandlerTests
 {

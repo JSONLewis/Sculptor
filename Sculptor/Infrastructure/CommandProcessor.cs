@@ -1,11 +1,10 @@
-﻿using Sculptor.Core.CommandHandlers;
-using Sculptor.Core.Commands;
+﻿using Sculptor.Core.Domain;
 using SimpleInjector;
 using System.Diagnostics;
 
 namespace Sculptor.Infrastructure
 {
-    public sealed class CommandProcessor : ICommandProcessor
+    internal sealed class CommandProcessor : ICommandProcessor
     {
         private readonly Container _container;
 

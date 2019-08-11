@@ -2,10 +2,9 @@
 using System.IO;
 using System.IO.Abstractions;
 using System.Text;
-using Sculptor.Core.Commands;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 
-namespace Sculptor.Core.CommandHandlers
+namespace Sculptor.Core.Domain.Create
 {
     public sealed class CreateCommandHandler : ICommandHandler<CreateCommand>
     {

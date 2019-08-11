@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace Sculptor.Core.Commands
+namespace Sculptor.Core.Domain.Create
 {
     [Verb("create", HelpText = "Create a new Sculptor project")]
     public sealed class CreateCommand : ICommand
