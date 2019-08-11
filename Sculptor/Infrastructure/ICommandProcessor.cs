@@ -2,7 +2,7 @@
 
 namespace Sculptor.Infrastructure
 {
-    internal interface ICommandProcessor
+    public interface ICommandProcessor
     {
         void Process(ICommand command);
     }

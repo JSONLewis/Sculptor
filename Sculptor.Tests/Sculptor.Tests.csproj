@@ -21,5 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Sculptor.Core\Sculptor.Core.csproj" />
     <ProjectReference Include="..\Sculptor.Infrastructure\Sculptor.Infrastructure.csproj" />
+    <ProjectReference Include="..\Sculptor\Sculptor.csproj" />
   </ItemGroup>
 </Project>

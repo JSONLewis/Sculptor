@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Sculptor.Infrastructure
 {
-    internal sealed class CommandProcessor : ICommandProcessor
+    public sealed class CommandProcessor : ICommandProcessor
     {
         private readonly Container _container;
 

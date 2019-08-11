@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.ValidationFormatters;
 using System;
@@ -9,9 +10,14 @@ namespace Sculptor
     {
         private static void Main(string[] args)
         {
+            // TODO:
+            // Look into how we can perform acceptance / regression testing by running a
+            // full instance of the application with a known set of commands.
+            // Maybe comparing the output screenshots? Or piping the response from
+            // STDOUT / STDERR etc.
 #if DEBUG
             // Valid Command using default name.
-            args = SplitArguments("create -n \"MyFirstProject\"");
+            args = ArgumentHelper.SplitArguments("create -n \"MyFirstProject\"");
 
             // Valid Command using non-default name.
             //args = SplitArguments("create -n \"MyFirstProject\" -o \"site\"");
@@ -28,6 +34,23 @@ namespace Sculptor
 
             try
             {
+                // TODO:
+                // Use this to store configuration information about the Sculptor tool
+                // itself. This should be verified on startup. Offer a rollback to
+                // default if it fails (and a dedicated command) and allow users to make
+                // changes for various internal settings.
+                // string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                // TODO:
+                // Once we have configuration files being read in properly we can then
+                // integrate a logging framework that uses this file to determine where to
+                // persist logs. (By default create a "log" folder in the same location).
+
+                // TODO:
+                // When we have a functioning logger using Serilog we can then replace the
+                // any method calling "Trace.WriteLine" with our injected logger and
+                // update the tests accordingly for verifying that failures are recorded.
+
                 Bootstrapper.InitialiseApplication();
                 var app = Bootstrapper.GetInstance<IApplication>();
 
@@ -62,32 +85,6 @@ namespace Sculptor
                 // bubble up. For now pretend we're doing something extra.
                 throw e;
             }
-        }
-
-        private static string[] SplitArguments(string rawInput)
-        {
-            var parmChars = rawInput.ToCharArray();
-            var inSingleQuote = false;
-            var inDoubleQuote = false;
-
-            for (var index = 0; index < parmChars.Length; index++)
-            {
-                if (parmChars[index] == '"' && !inSingleQuote)
-                {
-                    inDoubleQuote = !inDoubleQuote;
-                    parmChars[index] = '\n';
-                }
-                if (parmChars[index] == '\'' && !inDoubleQuote)
-                {
-                    inSingleQuote = !inSingleQuote;
-                    parmChars[index] = '\n';
-                }
-                if (!inSingleQuote && !inDoubleQuote && parmChars[index] == ' ')
-                    parmChars[index] = '\n';
-            }
-
-            return new string(parmChars)
-                .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

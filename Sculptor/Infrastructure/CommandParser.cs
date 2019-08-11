@@ -5,7 +5,7 @@ using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor.Infrastructure
 {
-    internal sealed class CommandParser : ICommandParser
+    public sealed class CommandParser : ICommandParser
     {
         private readonly ICommandProcessor _commandProcessor;
         private readonly IRegisteredVerbs _registeredVerbs;
@@ -39,6 +39,8 @@ namespace Sculptor.Infrastructure
                 }
             }
 
+            // TODO: Replace this method with either new dependency or a call to something
+            // else.
             HandleFailedParsing(userInput);
         }
 

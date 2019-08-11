@@ -3,7 +3,7 @@ using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor
 {
-    internal sealed class Application : IApplication
+    public sealed class Application : IApplication
     {
         private readonly ICommandParser _commandParser;
 
