@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CommandHandlerTests\" />
+    <Folder Include="DomainTests\" />
+    <Folder Include="DomainTests\CreateTests\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sculptor.Core\Sculptor.Core.csproj" />
