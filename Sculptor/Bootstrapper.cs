@@ -4,6 +4,7 @@ using Sculptor.Core.ConsoleAbstractions;
 using Sculptor.Infrastructure;
 using SimpleInjector;
 using System;
+using System.IO.Abstractions;
 
 namespace Sculptor
 {
@@ -24,10 +25,15 @@ namespace Sculptor
                 Lifestyle.Singleton);
 
             _container.Register<IRegisteredVerbs, RegisteredVerbs>(Lifestyle.Singleton);
+
+            _container.Register<IReservedDirectories, ReservedDirectories>(
+                Lifestyle.Singleton);
+
             _container.Register<ITerminal, Terminal>(Lifestyle.Singleton);
             _container.Register<ICommandParser, CommandParser>(Lifestyle.Singleton);
             _container.Register<IUserInput, UserInput>(Lifestyle.Singleton);
             _container.Register<IApplication, Application>(Lifestyle.Singleton);
+            _container.Register<IFileSystem, FileSystem>(Lifestyle.Singleton);
 
             _container.Register(typeof(ICommandHandler<>), AppDomain.CurrentDomain.GetAssemblies());
 
