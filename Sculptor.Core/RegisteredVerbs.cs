@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Sculptor.Core.Domain;
@@ -11,20 +12,13 @@ namespace Sculptor.Core
         {
             var commandType = typeof(ICommand);
 
-            string restrictedNamespace
-                = $"{nameof(Sculptor)}.{nameof(Core)}.{nameof(Domain)}";
-
-            var types = from type in Assembly.GetExecutingAssembly().GetTypes()
-                        where type.IsClass
-                          && type.Namespace.StartsWith(
-                              restrictedNamespace,
-                              StringComparison.Ordinal)
-                          && typeof(ICommand).IsAssignableFrom(type)
-                        select type;
-
-            KnownVerbs = types.ToArray();
+            KnownVerbs = from type in Assembly.GetExecutingAssembly().GetTypes()
+                         where type.IsClass
+                           && !type.IsAbstract
+                           && typeof(ICommand).IsAssignableFrom(type)
+                         select type;
         }
 
-        public Type[] KnownVerbs { get; }
+        public IEnumerable<Type> KnownVerbs { get; }
     }
 }

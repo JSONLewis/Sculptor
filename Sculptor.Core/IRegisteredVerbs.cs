@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sculptor.Core
 {
     public interface IRegisteredVerbs
     {
-        Type[] KnownVerbs { get; }
+        IEnumerable<Type> KnownVerbs { get; }
     }
 }

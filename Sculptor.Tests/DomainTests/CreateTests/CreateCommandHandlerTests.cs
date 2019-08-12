@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Sculptor.Core;
 using Sculptor.Core.Domain.Create;
 using Sculptor.Infrastructure.ConsoleAbstractions;
+using Serilog;
 
 namespace Sculptor.Tests.DomainTests.CreateTests
 {
@@ -29,9 +30,12 @@ namespace Sculptor.Tests.DomainTests.CreateTests
             var mockFileSystem = new MockFileSystem();
             mockFileSystem.AddDirectory(Environment.CurrentDirectory);
 
+            var mockLogger = new Mock<ILogger>();
+
             var handler = new CreateCommandHandler(
                 _mockTerminal.Object,
-                mockFileSystem);
+                mockFileSystem,
+                mockLogger.Object);
 
             const string projectName = "MyUnitTestProject";
             const string outputDirectoryName = "public";
@@ -68,9 +72,12 @@ namespace Sculptor.Tests.DomainTests.CreateTests
             var mockFileSystem = new MockFileSystem();
             mockFileSystem.AddDirectory(Environment.CurrentDirectory);
 
+            var mockLogger = new Mock<ILogger>();
+
             var handler = new CreateCommandHandler(
                 _mockTerminal.Object,
-                mockFileSystem);
+                mockFileSystem,
+                mockLogger.Object);
 
             const string projectName = "MyUnitTestProject";
 
@@ -95,9 +102,12 @@ namespace Sculptor.Tests.DomainTests.CreateTests
             var mockFileSystem = new MockFileSystem();
             mockFileSystem.AddDirectory(Environment.CurrentDirectory);
 
+            var mockLogger = new Mock<ILogger>();
+
             var handler = new CreateCommandHandler(
                 _mockTerminal.Object,
-                mockFileSystem);
+                mockFileSystem,
+                mockLogger.Object);
 
             handler.Handle(new CreateCommand
             {
@@ -105,7 +115,7 @@ namespace Sculptor.Tests.DomainTests.CreateTests
                 ProjectName = "MyUnitTestProject"
             });
 
-            _mockTerminal.Verify(mock => mock.RenderText(It.IsAny<string>()), Times.Exactly(3));
+            _mockTerminal.Verify(mock => mock.RenderText(It.IsAny<string>()), Times.Exactly(2));
         }
     }
 }

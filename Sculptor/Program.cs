@@ -1,8 +1,9 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.ValidationFormatters;
-using System;
+using Serilog;
 
 namespace Sculptor
 {
@@ -30,28 +31,11 @@ namespace Sculptor
 
             // Invalid Command Verb.
             //args = SplitArguments("invalidverb -t");
-#endif         
-
+#endif
             try
             {
-                // TODO:
-                // Use this to store configuration information about the Sculptor tool
-                // itself. This should be verified on startup. Offer a rollback to
-                // default if it fails (and a dedicated command) and allow users to make
-                // changes for various internal settings.
-                // string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-                // TODO:
-                // Once we have configuration files being read in properly we can then
-                // integrate a logging framework that uses this file to determine where to
-                // persist logs. (By default create a "log" folder in the same location).
-
-                // TODO:
-                // When we have a functioning logger using Serilog we can then replace the
-                // any method calling "Trace.WriteLine" with our injected logger and
-                // update the tests accordingly for verifying that failures are recorded.
-
                 Bootstrapper.InitialiseApplication();
+
                 var app = Bootstrapper.GetInstance<IApplication>();
 
                 var command = Bootstrapper.GetInstance<IUserInput>();
@@ -61,17 +45,19 @@ namespace Sculptor
             }
             catch (ValidationException e)
             {
+                var logger = Bootstrapper.GetInstance<ILogger>();
+                logger.Error($"[{nameof(Program)}.{nameof(Program.Main)}] encountered a Validation Exception due to invalid user input. The following exception was captured: {{@Exception}}", e);
+
                 var validationFormatter = Bootstrapper
                     .GetInstance<IFluentValidationFormatter>();
 
-                // TODO: serialise this object and log the full thing to file.
-                var groupedErrors = validationFormatter.GroupExceptionsByName(e.Errors);
-
                 // TODO: look into a way of better highlighting errors in a cross platform
-                // compliant way. Should they be in a different colour etc?
+                // compliant way. Should they be in a different colour etc or just let
+                // the user's own preferences decide the formatting of the output?
                 var terminal = Bootstrapper.GetInstance<ITerminal>();
                 var templateBuilder = Bootstrapper.GetInstance<ITemplateBuilder>();
 
+                var groupedErrors = validationFormatter.GroupExceptionsByName(e.Errors);
                 string message = groupedErrors.FormatPrimaryErrorMessages();
                 string template = templateBuilder.BuildErrorTemplate(message);
 
@@ -81,8 +67,17 @@ namespace Sculptor
             }
             catch (Exception e)
             {
-                // TODO: try to log as much information as possible before letting this
-                // bubble up. For now pretend we're doing something extra.
+                // TODO: verify that it's not an issue with the Container that's causing
+                // us to crash and that we're still able to log. We don't want to muddy
+                // the water by causing another exception to be thrown and masking the
+                // actual issue.
+
+                // Log as much information as we can (this will probably need to be more
+                // than just the raw stack trace later on, but this is fine for now).
+                var logger = Bootstrapper.GetInstance<ILogger>();
+                logger.Fatal($"[{nameof(Program)}.{nameof(Program.Main)}] encountered an unexpected, unrecoverable exception and had to terminate. The following exception was captured: {{@Exception}}", e);
+
+                // Now let the program crash as we have no idea how to recover from this.
                 throw e;
             }
         }

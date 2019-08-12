@@ -1,7 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System.Linq;
 using CommandLine;
 using Sculptor.Core;
 using Sculptor.Infrastructure.ConsoleAbstractions;
+using Serilog;
 
 namespace Sculptor.Infrastructure
 {
@@ -9,46 +10,47 @@ namespace Sculptor.Infrastructure
     {
         private readonly ICommandProcessor _commandProcessor;
         private readonly IRegisteredVerbs _registeredVerbs;
+        private readonly ILogger _logger;
 
         public CommandParser(
             ICommandProcessor commandProcessor,
-            IRegisteredVerbs registeredVerbs)
+            IRegisteredVerbs registeredVerbs,
+            ILogger logger)
         {
             _commandProcessor = commandProcessor;
             _registeredVerbs = registeredVerbs;
+            _logger = logger;
         }
 
         public void Parse(IUserInput userInput)
         {
+            _logger.Information($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] called with the following parameter: {{@UserInput}}", userInput);
+
             var result = Parser.Default.ParseArguments(
                 userInput.Arguments,
-                _registeredVerbs.KnownVerbs);
+                _registeredVerbs.KnownVerbs.ToArray());
 
             if (result.Tag == ParserResultType.Parsed)
             {
+                _logger.Information($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] succesfully parsed: {{@UserInput}}", userInput);
+
                 dynamic parsedCommand = (result as Parsed<object>)?.Value;
 
-                if (parsedCommand != null)
+                if (parsedCommand is null)
                 {
-                    // Make the raw parse result available to any part of the program
-                    // that takes a dependency on the Singleton `IUserInput`.
-                    userInput.ParsedCommand = result;
-
-                    _commandProcessor.Process(parsedCommand);
+                    _logger.Fatal($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] failed to parse: {{@UserInput}} to a non-null result", userInput);
                     return;
                 }
+
+                // Make the raw parse result available to any part of the program
+                // that takes a dependency on the Singleton `IUserInput`.
+                userInput.ParsedCommand = result;
+
+                _commandProcessor.Process(parsedCommand);
+                return;
             }
 
-            // TODO: Replace this method with either new dependency or a call to something
-            // else.
-            HandleFailedParsing(userInput);
-        }
-
-        private void HandleFailedParsing(IUserInput userInput)
-        {
-            // TODO: replace this with a call to a logger so that we record this
-            // information on disk.
-            Trace.WriteLine($"Failure processing `{userInput.Raw}`. Now invoking {nameof(HandleFailedParsing)}");
+            _logger.Fatal($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] failed trying to parse: {{@UserInput}}", userInput);
         }
     }
 }

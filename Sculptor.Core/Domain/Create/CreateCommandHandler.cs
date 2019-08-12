@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Text;
 using Sculptor.Infrastructure.ConsoleAbstractions;
+using Serilog;
 
 namespace Sculptor.Core.Domain.Create
 {
@@ -10,22 +11,25 @@ namespace Sculptor.Core.Domain.Create
     {
         private readonly ITerminal _console;
         private readonly IFileSystem _fileSystem;
+        private readonly ILogger _logger;
 
         public CreateCommandHandler(
             ITerminal console,
-            IFileSystem fileSystem)
+            IFileSystem fileSystem,
+            ILogger logger)
         {
             _console = console;
             _fileSystem = fileSystem;
+            _logger = logger;
         }
 
         public void Handle(CreateCommand command)
         {
-            // TODO: add messages like this to a log instead of Stdout. (Maybe we would
-            // want to do something like this in a 'verbose' mode though).
-            _console.RenderText($"Succesfully called the {nameof(Handle)} method of {nameof(CreateCommandHandler)}");
+            _logger.Information($"[{nameof(CreateCommandHandler)}.{nameof(CreateCommandHandler.Handle)}] successfully called with the parameter: {{@Command}}", command);
 
-            string projectRootPath = _fileSystem.Path.Combine(Environment.CurrentDirectory, command.ProjectName);
+            string projectRootPath = _fileSystem.Path.Combine(
+                Environment.CurrentDirectory,
+                command.ProjectName);
 
             string outputPath = _fileSystem.Path.Combine(
                 projectRootPath,
@@ -40,12 +44,14 @@ namespace Sculptor.Core.Domain.Create
             _fileSystem.Directory.CreateDirectory(contentPath);
 
             const string configFileName = "appsettings.json";
-            string configFilePath = _fileSystem.Path.Combine(projectRootPath, configFileName);
+            string configFilePath = _fileSystem.Path.Combine(
+                projectRootPath,
+                configFileName);
 
-            var fileContent = Encoding.UTF8.GetBytes("{}");
+            var emptyFileContent = Encoding.UTF8.GetBytes("{}");
 
-            using (Stream stream = _fileSystem.FileStream.Create(configFilePath, FileMode.Create))
-            using (var memoryStream = new MemoryStream(fileContent))
+            using (var stream = _fileSystem.FileStream.Create(configFilePath, FileMode.Create))
+            using (var memoryStream = new MemoryStream(emptyFileContent))
             {
                 memoryStream.CopyTo(stream);
                 stream.Flush();
