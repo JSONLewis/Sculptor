@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.IO.Abstractions;
-using System.Reflection;
-using System.Text;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Sculptor.Core;
 using Sculptor.Core.Domain;
@@ -12,6 +7,11 @@ using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.ValidationFormatters;
 using Serilog;
 using SimpleInjector;
+using System;
+using System.IO;
+using System.IO.Abstractions;
+using System.Reflection;
+using System.Text;
 
 namespace Sculptor
 {
@@ -152,6 +152,6 @@ namespace Sculptor
                 .CreateLogger();
         }
 
-        #endregion
+        #endregion Helpers
     }
 }

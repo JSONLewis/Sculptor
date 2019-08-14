@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using CommandLine;
+﻿using CommandLine;
 using Sculptor.Core;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Serilog;
+using System.Linq;
 
 namespace Sculptor.Infrastructure
 {

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CommandLine;
+using System;
 using System.Collections.Generic;
-using CommandLine;
 
 namespace Sculptor.Infrastructure.ConsoleAbstractions
 {

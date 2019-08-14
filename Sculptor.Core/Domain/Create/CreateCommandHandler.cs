@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Sculptor.Infrastructure.ConsoleAbstractions;
+using Serilog;
+using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Text;
-using Sculptor.Infrastructure.ConsoleAbstractions;
-using Serilog;
 
 namespace Sculptor.Core.Domain.Create
 {

@@ -1,9 +1,9 @@
-﻿using System;
-using FluentValidation;
+﻿using FluentValidation;
 using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.ValidationFormatters;
 using Serilog;
+using System;
 
 namespace Sculptor
 {

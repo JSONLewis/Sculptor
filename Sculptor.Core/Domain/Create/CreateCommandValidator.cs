@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FluentValidation;
+using System;
 using System.IO.Abstractions;
-using FluentValidation;
 
 namespace Sculptor.Core.Domain.Create
 {
@@ -50,7 +50,6 @@ namespace Sculptor.Core.Domain.Create
                 || !_reservedDirectories.IsDirectoryNameReserved(directoryName);
         }
 
-        #endregion
-
+        #endregion Helpers
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Sculptor.Core;
-using Sculptor.Core.Domain;
 using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 

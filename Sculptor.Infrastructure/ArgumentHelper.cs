@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Sculptor.Infrastructure
 {
     public static class ArgumentHelper

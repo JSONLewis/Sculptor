@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO.Abstractions.TestingHelpers;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Sculptor.Core;
 using Sculptor.Core.Domain.Create;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Serilog;
+using System;
+using System.IO.Abstractions.TestingHelpers;
 
 namespace Sculptor.Tests.DomainTests.CreateTests
 {
@@ -22,7 +22,7 @@ namespace Sculptor.Tests.DomainTests.CreateTests
             _mockTerminal.Setup(x => x.RenderText(It.IsAny<string>()));
         }
 
-        #endregion
+        #endregion Setup
 
         [Test]
         public void CreateCommandHandlerOnSuccessHasValidDirectoryStructure()

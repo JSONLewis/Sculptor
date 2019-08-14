@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using FluentValidation.Results;
+using System.Collections.Generic;
 using System.Linq;
-using FluentValidation.Results;
-using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor.ValidationFormatters
 {
