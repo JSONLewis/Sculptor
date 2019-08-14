@@ -108,15 +108,18 @@ namespace Sculptor
                         Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                         "appsettings.json");
 
-                    string fileText = File.ReadAllText(defaultConfigFilePath, Encoding.UTF8);
+                    string fileText = File.ReadAllText(
+                        defaultConfigFilePath,
+                        Encoding.UTF8);
+
                     string defaultLogPath = Path.Combine(rootConfigPath, "log");
 
                     Directory.CreateDirectory(defaultLogPath);
 
-                    string defaultLogFilePath = Path.Combine(defaultLogPath, "{Date}-sculptor-cli.log");
                     string processedText = fileText.Replace(
                         "<<PATH_FORMAT>>",
-                        defaultLogFilePath);
+                        BuildPlatformIndependentPath(
+                            Path.Combine(defaultLogPath, "{Date}-sculptor-cli.log")));
 
                     byte[] configFileBytes = Encoding.UTF8.GetBytes(processedText);
                     file.Write(configFileBytes);
@@ -150,6 +153,19 @@ namespace Sculptor
                 //.MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Verbose)
                 //#endif
                 .CreateLogger();
+        }
+
+        /// <summary>
+        /// Any path written to a config file needs to be written in a way that works on
+        /// Windows, Linux, and OSX. So that we're consistent and don't have to worry
+        /// about escaping the directory separator this method enforces "/" as the
+        /// separator on all platforms.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static string BuildPlatformIndependentPath(string path)
+        {
+            return path.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         #endregion Helpers
