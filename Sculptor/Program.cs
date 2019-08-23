@@ -11,27 +11,6 @@ namespace Sculptor
     {
         private static void Main(string[] args)
         {
-            // TODO:
-            // Look into how we can perform acceptance / regression testing by running a
-            // full instance of the application with a known set of commands.
-            // Maybe comparing the output screenshots? Or piping the response from
-            // STDOUT / STDERR etc.
-#if DEBUG
-            // Valid Command using default name.
-            args = ArgumentHelper.SplitArguments("create -n \"MyFirstProject\"");
-
-            // Valid Command using non-default name.
-            //args = SplitArguments("create -n \"MyFirstProject\" -o \"site\"");
-
-            // Invalid Command with no value provided for the name.
-            //args = SplitArguments("create -n");
-
-            // Invalid Command Argument.
-            //args = SplitArguments("create -n \"MyFirstProject\" -o \"public\" --invalidOption");
-
-            // Invalid Command Verb.
-            //args = SplitArguments("invalidverb -t");
-#endif
             try
             {
                 Bootstrapper.InitialiseApplication();
