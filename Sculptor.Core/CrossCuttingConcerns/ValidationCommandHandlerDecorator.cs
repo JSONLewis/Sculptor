@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Sculptor.Core.Domain;
+using Sculptor.Infrastructure.Exceptions.ValidationExceptions;
 
 namespace Sculptor.Core
 {
@@ -32,7 +33,7 @@ namespace Sculptor.Core
             // Exit out of the decorator calls and let the caller handle informing
             // the user of the found errors.
             if (validationResult.Errors.Count > 0)
-                throw new ValidationException(validationResult.Errors);
+                throw new SculptorValidationException("Validation failure(s) encountered", validationResult.Errors, command);
 
             // No errors reported so fall into the next inner command.
             _decorated.Handle(command);

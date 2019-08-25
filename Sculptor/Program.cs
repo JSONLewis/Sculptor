@@ -1,9 +1,6 @@
-﻿using FluentValidation;
-using Sculptor.Infrastructure;
+﻿using System;
 using Sculptor.Infrastructure.ConsoleAbstractions;
-using Sculptor.ValidationFormatters;
 using Serilog;
-using System;
 
 namespace Sculptor
 {
@@ -15,34 +12,11 @@ namespace Sculptor
             {
                 Bootstrapper.InitialiseApplication();
 
+                var userInput = Bootstrapper.GetInstance<IUserInput>();
+                userInput.Arguments = args;
+
                 var app = Bootstrapper.GetInstance<IApplication>();
-
-                var command = Bootstrapper.GetInstance<IUserInput>();
-                command.Arguments = args;
-
-                app.Run(command);
-            }
-            catch (ValidationException e)
-            {
-                var logger = Bootstrapper.GetInstance<ILogger>();
-                logger.Error($"[{nameof(Program)}.{nameof(Program.Main)}] encountered a Validation Exception due to invalid user input. The following exception was captured: {{@Exception}}", e);
-
-                var validationFormatter = Bootstrapper
-                    .GetInstance<IFluentValidationFormatter>();
-
-                // TODO: look into a way of better highlighting errors in a cross platform
-                // compliant way. Should they be in a different colour etc or just let
-                // the user's own preferences decide the formatting of the output?
-                var terminal = Bootstrapper.GetInstance<ITerminal>();
-                var templateBuilder = Bootstrapper.GetInstance<ITemplateBuilder>();
-
-                var groupedErrors = validationFormatter.GroupExceptionsByName(e.Errors);
-                string message = groupedErrors.FormatPrimaryErrorMessages();
-                string template = templateBuilder.BuildErrorTemplate(message);
-
-                // TODO: look into a verbose flag for controlling how much information
-                // should be shown.
-                terminal.RenderText(template);
+                app.Run(userInput);
             }
             catch (Exception e)
             {

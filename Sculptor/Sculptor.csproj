@@ -18,10 +18,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sculptor.Core\Sculptor.Core.csproj" />
+    <ProjectReference Include="..\Sculptor.Infrastructure\Sculptor.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ValidationFormatters\" />
+    <Folder Include="Parsing\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="default-app-settings.json">

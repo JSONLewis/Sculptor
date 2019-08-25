@@ -1,5 +1,4 @@
-﻿using CommandLine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Sculptor.Infrastructure.ConsoleAbstractions
@@ -16,7 +15,5 @@ namespace Sculptor.Infrastructure.ConsoleAbstractions
         public ICollection<string> Arguments { get; set; }
 
         public DateTime SubmittedOn { get; }
-
-        public ParserResult<object> ParsedCommand { get; set; }
     }
 }

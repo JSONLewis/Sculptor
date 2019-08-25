@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sculptor.ValidationFormatters
+namespace Sculptor.Infrastructure.Exceptions.ValidationExceptions
 {
     internal static class FluentValidationFormatterExtensions
     {

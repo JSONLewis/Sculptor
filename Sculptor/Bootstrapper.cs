@@ -1,17 +1,19 @@
-﻿using FluentValidation;
+﻿using System;
+using System.IO;
+using System.IO.Abstractions;
+using System.Reflection;
+using System.Text;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Sculptor.Core;
 using Sculptor.Core.Domain;
 using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.ConsoleAbstractions;
-using Sculptor.ValidationFormatters;
+using Sculptor.Infrastructure.Exceptions;
+using Sculptor.Infrastructure.OutputFormatters;
+using Sculptor.Parsing;
 using Serilog;
 using SimpleInjector;
-using System;
-using System.IO;
-using System.IO.Abstractions;
-using System.Reflection;
-using System.Text;
 
 namespace Sculptor
 {
@@ -50,9 +52,9 @@ namespace Sculptor
             _container.Register<IApplication, Application>(Lifestyle.Singleton);
             _container.Register<IFileSystem, FileSystem>(Lifestyle.Singleton);
 
-            _container.Register<ITemplateBuilder, TemplateBuilder>(Lifestyle.Singleton);
-            _container.Register<IFluentValidationFormatter, FluentValidationFormatter>(
-                Lifestyle.Singleton);
+            _container.Register<IExceptionHandler, ExceptionHandler>(Lifestyle.Singleton);
+            //_container.RegisterSingleton<IOutputFormatter>(() => new OutputFormatter());
+            _container.Register<IOutputFormatter, OutputFormatter>(Lifestyle.Singleton);
 
             _container.Register(typeof(ICommandHandler<>), assemblies);
 

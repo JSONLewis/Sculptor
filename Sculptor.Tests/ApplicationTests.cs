@@ -1,8 +1,9 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Sculptor.Core;
 using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.ConsoleAbstractions;
+using Sculptor.Infrastructure.Exceptions;
+using Sculptor.Parsing;
 
 namespace Sculptor.Tests
 {
@@ -17,12 +18,17 @@ namespace Sculptor.Tests
             };
 
             var mockCommandProcessor = new Mock<ICommandProcessor>();
-            var mockRegisteredVerbs = new Mock<IRegisteredVerbs>();
 
             var mockCommandParser = new Mock<ICommandParser>();
             mockCommandParser.Setup(x => x.Parse(userInput)).Verifiable();
 
-            var application = new Application(mockCommandParser.Object);
+            var mockExceptionHandler = new Mock<IExceptionHandler>();
+
+            var application = new Application(
+                mockCommandParser.Object,
+                mockCommandProcessor.Object,
+                mockExceptionHandler.Object);
+
             application.Run(userInput);
 
             mockCommandParser.VerifyAll();

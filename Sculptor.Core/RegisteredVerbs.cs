@@ -1,8 +1,7 @@
-﻿using Sculptor.Core.Domain;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+using Sculptor.Core.Domain;
 
 namespace Sculptor.Core
 {
@@ -12,13 +11,13 @@ namespace Sculptor.Core
         {
             var commandType = typeof(ICommand);
 
-            KnownVerbs = from type in Assembly.GetExecutingAssembly().GetTypes()
-                         where type.IsClass
-                           && !type.IsAbstract
-                           && typeof(ICommand).IsAssignableFrom(type)
-                         select type;
+            KnownVerbs = (from type in Assembly.GetExecutingAssembly().GetTypes()
+                          where type.IsClass
+                            && !type.IsAbstract
+                            && typeof(ICommand).IsAssignableFrom(type)
+                          select type).ToArray();
         }
 
-        public IEnumerable<Type> KnownVerbs { get; }
+        public Type[] KnownVerbs { get; }
     }
 }
