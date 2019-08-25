@@ -53,7 +53,6 @@ namespace Sculptor
             _container.Register<IFileSystem, FileSystem>(Lifestyle.Singleton);
 
             _container.Register<IExceptionHandler, ExceptionHandler>(Lifestyle.Singleton);
-            //_container.RegisterSingleton<IOutputFormatter>(() => new OutputFormatter());
             _container.Register<IOutputFormatter, OutputFormatter>(Lifestyle.Singleton);
 
             _container.Register(typeof(ICommandHandler<>), assemblies);
