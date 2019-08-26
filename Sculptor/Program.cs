@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+using Sculptor.Infrastructure.Configuration;
 using Sculptor.Infrastructure.ConsoleAbstractions;
-using Serilog;
+using Sculptor.Infrastructure.Logging;
 
 namespace Sculptor
 {
@@ -10,9 +9,11 @@ namespace Sculptor
     {
         private static void Main(string[] args)
         {
+            var commandScope = GetCommandScope(args);
+
             try
             {
-                Bootstrapper.InitialiseApplication();
+                Bootstrapper.InitialiseApplication(commandScope);
             }
             catch (Exception ex)
             {
@@ -28,31 +29,46 @@ namespace Sculptor
 
             try
             {
+#if DEBUG
+                // For the sake of debugging commands that will be invoked in project
+                // directories (such as launching the web server) set the value here to
+                // match the folder created under the bin folder as appropriate.
+                // Environment.CurrentDirectory = Path.Combine(Environment.CurrentDirectory, "MyFirstProject");
+#endif
                 app.Run(userInput);
             }
             catch (Exception e)
             {
-                var logger = Bootstrapper.GetInstance<ILogger>();
-                logger.Fatal($"[{nameof(Program)}.{nameof(Program.Main)}] encountered an unexpected, unrecoverable exception and had to terminate. The following exception was captured: {{@Exception}}", e);
+                var logger = Bootstrapper.GetInstance<IGlobalLogger>();
+                logger.Instance.Fatal($"[{nameof(Program)}.{nameof(Program.Main)}] encountered an unexpected, unrecoverable exception and had to terminate. The following exception was captured: {{@Exception}}", e);
 
                 var terminal = Bootstrapper.GetInstance<ITerminal>();
-                var configuration = Bootstrapper.GetInstance<IConfiguration>();
+                var configuration = Bootstrapper.GetInstance<IGlobalConfiguration>();
 
-                // TODO: abstract away items in the config we expect to always exist -
-                // maybe verify on startup and throw if not as well?
-                var rollingFileConfig = configuration
-                    .GetSection("Serilog")
-                    .GetSection("WriteTo")
-                    .GetChildren()
-                    .FirstOrDefault(x => x["Name"] == "RollingFile");
-
-                var globalLogPath = rollingFileConfig["Args:pathFormat"];
-
-                terminal.RenderText($"[{nameof(Program)}.{nameof(Program.Main)}] encountered an unrecoverable error. Check the latest log at `{globalLogPath}` for full details");
-
-                // Now crash out as we have no idea how to recover from this exception.
-                throw;
+                terminal.RenderText($"[{nameof(Program)}.{nameof(Program.Main)}] encountered an unrecoverable error. Check the latest log at `{configuration.LogDirectoryPath}` for full details");
             }
         }
+
+        /// <summary>
+        /// Works out if the arguments provided represent a change to an existing project
+        /// (local scope) or one that can be invoked anywhere (global).
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private static CommandScope GetCommandScope(string[] args)
+        {
+            if (args.Length <= 0)
+                throw new NotSupportedException("Sculptor must be invoked with at least one verb");
+
+            return args[0].Equals("create", StringComparison.OrdinalIgnoreCase)
+                ? CommandScope.Global
+                : CommandScope.Local;
+        }
+    }
+
+    enum CommandScope
+    {
+        Global,
+        Local
     }
 }

@@ -1,18 +1,16 @@
 ﻿using System;
-using System.IO;
 using System.IO.Abstractions;
-using System.Reflection;
-using System.Text;
 using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Sculptor.Core;
 using Sculptor.Core.Domain;
+using Sculptor.Core.Domain.Create;
 using Sculptor.Infrastructure;
+using Sculptor.Infrastructure.Configuration;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.Infrastructure.Exceptions;
+using Sculptor.Infrastructure.Logging;
 using Sculptor.Infrastructure.OutputFormatters;
 using Sculptor.Parsing;
-using Serilog;
 using SimpleInjector;
 
 namespace Sculptor
@@ -26,14 +24,13 @@ namespace Sculptor
             _container = new Container();
         }
 
-        public static void InitialiseApplication()
+        public static void InitialiseApplication(CommandScope commandScope)
         {
+            var fileSystem = new FileSystem();
+            BuildInfrastructure(fileSystem, commandScope);
+
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
             _container.Register(typeof(IValidator<>), assemblies);
-
-            _container.RegisterSingleton(BuildConfiguration);
-            _container.RegisterSingleton(InitialiseLogger);
 
             _container.Register(
                 typeof(ICommandProcessor),
@@ -50,10 +47,13 @@ namespace Sculptor
             _container.Register<IUserInput, UserInput>(Lifestyle.Singleton);
 
             _container.Register<IApplication, Application>(Lifestyle.Singleton);
-            _container.Register<IFileSystem, FileSystem>(Lifestyle.Singleton);
+            _container.RegisterSingleton<IFileSystem>(() => fileSystem);
 
             _container.Register<IExceptionHandler, ExceptionHandler>(Lifestyle.Singleton);
             _container.Register<IOutputFormatter, OutputFormatter>(Lifestyle.Singleton);
+
+            _container.Register<IConfigComposer, ConfigComposer>(Lifestyle.Singleton);
+            _container.Register<IContentComposer, ContentComposer>(Lifestyle.Singleton);
 
             _container.Register(typeof(ICommandHandler<>), assemblies);
 
@@ -67,7 +67,7 @@ namespace Sculptor
 
         /// <summary>
         /// Acts as a Service Locator for use by the entry point (Program.cs) as this
-        /// cannot make use of the container for injecting its dependencies.
+        /// cannot have its dependencies injected.
         /// </summary>
         /// <typeparam name="TInstance"></typeparam>
         /// <returns></returns>
@@ -79,94 +79,32 @@ namespace Sculptor
         #region Helpers
 
         /// <summary>
-        /// Creates and verifies that we have access to a configuration instance
-        /// implemented by <see cref="IConfiguration"/>. This abstracts from the JSON
-        /// settings file we store on disk in
-        /// <see cref="Environment.SpecialFolder.LocalApplicationData"/>.
+        /// Registers the co-dependent configuration and logging dependencies.
         /// </summary>
-        /// <returns></returns>
-        private static IConfiguration BuildConfiguration()
+        private static void BuildInfrastructure(FileSystem fileSystem, CommandScope commandType)
         {
-            // TODO: handle this directory already existing - but from another tool or
-            // component etc. Offer the user the ability to set their own value for this?
-            const string configDirectoryName = "sculptor-cli";
+            var configurationResolver = new ConfigurationResolver(fileSystem);
 
-            string rootConfigPath = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData), configDirectoryName);
+            var globalConfig = configurationResolver
+                .BuildConfiguration<GlobalConfiguration>();
 
-            const string configFileName = "config.json";
-            string configFilePath = Path.Combine(rootConfigPath, configFileName);
+            _container.RegisterSingleton<IGlobalConfiguration>(
+                () => new GlobalConfiguration(globalConfig));
 
-            // TODO: refactor this entire block into something a little nicer.
-            if (!File.Exists(configFilePath))
+            _container.RegisterSingleton<IGlobalLogger>(
+               () => new GlobalLogger(globalConfig.AddLogging()));
+
+            if (commandType == CommandScope.Local)
             {
-                Directory.CreateDirectory(rootConfigPath);
+                var localConfig = configurationResolver
+                .BuildConfiguration<LocalConfiguration>();
 
-                using (var file = File.Create(configFilePath))
-                {
-                    string defaultConfigFilePath = Path.Combine(
-                        Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                        "appsettings.json");
+                _container.RegisterSingleton<ILocalConfiguration>(
+                    () => new LocalConfiguration(localConfig));
 
-                    string fileText = File.ReadAllText(
-                        defaultConfigFilePath,
-                        Encoding.UTF8);
-
-                    string defaultLogPath = Path.Combine(rootConfigPath, "log");
-
-                    Directory.CreateDirectory(defaultLogPath);
-
-                    string processedText = fileText.Replace(
-                        "<<PATH_FORMAT>>",
-                        BuildPlatformIndependentPath(
-                            Path.Combine(defaultLogPath, "{Date}-sculptor-cli.log")));
-
-                    byte[] configFileBytes = Encoding.UTF8.GetBytes(processedText);
-                    file.Write(configFileBytes);
-                }
+                _container.RegisterSingleton<ILocalLogger>(
+                () => new LocalLogger(localConfig.AddLogging()));
             }
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(rootConfigPath)
-                .AddJsonFile(configFileName, optional: false, reloadOnChange: false);
-
-            return builder.Build();
-        }
-
-        /// <summary>
-        /// Using the <see cref="IConfiguration"/> instance provided by the previous call
-        /// to <see cref="BuildConfiguration"/> we can now instantiate the logger using
-        /// the settings stored in the JSON file. These settings can be edited by the end
-        /// user so long as they conform to the <see cref="Serilog"/> docs.
-        /// </summary>
-        /// <returns></returns>
-        private static ILogger InitialiseLogger()
-        {
-            return Log.Logger = new LoggerConfiguration()
-                .ReadFrom
-                .Configuration(GetInstance<IConfiguration>())
-                //#if DEBUG
-                // TODO: code as shown below doens't seem to be working in the way I
-                // expect. Something is being done wrong and needs investigation.
-                //.MinimumLevel.Debug()
-                //.MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Verbose)
-                //.MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Verbose)
-                //#endif
-                .CreateLogger();
-        }
-
-        /// <summary>
-        /// Any path written to a config file needs to be written in a way that works on
-        /// Windows, Linux, and OSX. So that we're consistent and don't have to worry
-        /// about escaping the directory separator this method enforces "/" as the
-        /// separator on all platforms.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private static string BuildPlatformIndependentPath(string path)
-        {
-            return path.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         #endregion Helpers

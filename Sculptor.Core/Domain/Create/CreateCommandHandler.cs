@@ -1,31 +1,35 @@
-﻿using Sculptor.Infrastructure.ConsoleAbstractions;
-using Serilog;
-using System;
-using System.IO;
+﻿using System;
 using System.IO.Abstractions;
-using System.Text;
+using Sculptor.Infrastructure.ConsoleAbstractions;
+using Sculptor.Infrastructure.Logging;
 
 namespace Sculptor.Core.Domain.Create
 {
     public sealed class CreateCommandHandler : ICommandHandler<CreateCommand>
     {
-        private readonly ITerminal _console;
+        private readonly IConfigComposer _configComposer;
+        private readonly IContentComposer _contentComposer;
         private readonly IFileSystem _fileSystem;
-        private readonly ILogger _logger;
+        private readonly ITerminal _terminal;
+        private readonly IGlobalLogger _logger;
 
         public CreateCommandHandler(
-            ITerminal console,
+            IConfigComposer configComposer,
+            IContentComposer contentComposer,
             IFileSystem fileSystem,
-            ILogger logger)
+            ITerminal terminal,
+            IGlobalLogger logger)
         {
-            _console = console;
+            _configComposer = configComposer;
+            _contentComposer = contentComposer;
             _fileSystem = fileSystem;
+            _terminal = terminal;
             _logger = logger;
         }
 
         public void Handle(CreateCommand command)
         {
-            _logger.Information($"[{nameof(CreateCommandHandler)}.{nameof(CreateCommandHandler.Handle)}] successfully called with the parameter: {{@Command}}", command);
+            _logger.Instance.Information($"[{nameof(CreateCommandHandler)}.{nameof(CreateCommandHandler.Handle)}] successfully called with the parameter: {{@Command}}", command);
 
             string projectRootPath = _fileSystem.Path.Combine(
                 Environment.CurrentDirectory,
@@ -35,31 +39,16 @@ namespace Sculptor.Core.Domain.Create
                 projectRootPath,
                 command.OutputDirectoryName);
 
+            _fileSystem.Directory.CreateDirectory(projectRootPath);
             _fileSystem.Directory.CreateDirectory(outputPath);
 
-            string contentPath = _fileSystem.Path.Combine(
-                projectRootPath,
-                ReservedDirectories.ContentDirectoryName);
+            _configComposer.Compose(command.ProjectName, projectRootPath, outputPath);
+            _contentComposer.Compose(projectRootPath);
 
-            _fileSystem.Directory.CreateDirectory(contentPath);
+            _terminal.RenderText("Successfully created a Sculptor project on disk.");
+            _terminal.RenderText($"The project root can be found at: `{projectRootPath}`");
 
-            const string configFileName = "appsettings.json";
-            string configFilePath = _fileSystem.Path.Combine(
-                projectRootPath,
-                configFileName);
-
-            var emptyFileContent = Encoding.UTF8.GetBytes("{}");
-
-            using (var stream = _fileSystem.FileStream.Create(configFilePath, FileMode.Create))
-            using (var memoryStream = new MemoryStream(emptyFileContent))
-            {
-                memoryStream.CopyTo(stream);
-                stream.Flush();
-                stream.Close();
-            }
-
-            _console.RenderText("Successfully created a Sculptor project on disk.");
-            _console.RenderText($"The project root can be found at: `{projectRootPath}`");
+            _logger.Instance.Information($"[{nameof(CreateCommandHandler)}.{nameof(CreateCommandHandler.Handle)}] successfully created a Sculptor project on disk from the parameter: {{@Command}}", command);
         }
     }
 }

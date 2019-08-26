@@ -5,6 +5,8 @@ using NUnit.Framework;
 using Sculptor.Core;
 using Sculptor.Core.Domain.Create;
 using Sculptor.Infrastructure.ConsoleAbstractions;
+using Sculptor.Infrastructure.Logging;
+using Sculptor.Tests.Helpers;
 using Serilog;
 
 namespace Sculptor.Tests.DomainTests.CreateTests
@@ -12,6 +14,7 @@ namespace Sculptor.Tests.DomainTests.CreateTests
     public class CreateCommandHandlerTests
     {
         private Mock<ITerminal> _mockTerminal;
+        private Mock<IGlobalLogger> _mockGlobalLogger;
 
         #region Setup
 
@@ -20,6 +23,15 @@ namespace Sculptor.Tests.DomainTests.CreateTests
         {
             _mockTerminal = new Mock<ITerminal>();
             _mockTerminal.Setup(x => x.RenderText(It.IsAny<string>()));
+
+            var logger = new Mock<ILogger>();
+
+            _mockGlobalLogger = new Mock<IGlobalLogger>();
+
+            // TODO: write test for verifying expected methods called on error etc.
+            _mockGlobalLogger
+                .Setup(x => x.Instance)
+                .Returns(new GlobalLogger(logger.Object).Instance);
         }
 
         #endregion Setup
@@ -30,12 +42,21 @@ namespace Sculptor.Tests.DomainTests.CreateTests
             var mockFileSystem = new MockFileSystem();
             mockFileSystem.AddDirectory(Environment.CurrentDirectory);
 
-            var mockLogger = new Mock<ILogger>();
+            var globalTuple = MockFileSystemHelper.GetGlobalTemplateMock();
+            mockFileSystem.AddFile(globalTuple.Item1, globalTuple.Item2);
+
+            var localTuple = MockFileSystemHelper.GetLocalTemplateMock();
+            mockFileSystem.AddFile(localTuple.Item1, localTuple.Item2);
+
+            var configComposer = new ConfigComposer(mockFileSystem);
+            var contentComposer = new ContentComposer(mockFileSystem);
 
             var handler = new CreateCommandHandler(
-                _mockTerminal.Object,
+                configComposer,
+                contentComposer,
                 mockFileSystem,
-                mockLogger.Object);
+                _mockTerminal.Object,
+                _mockGlobalLogger.Object);
 
             const string projectName = "MyUnitTestProject";
             const string outputDirectoryName = "public";
@@ -69,15 +90,25 @@ namespace Sculptor.Tests.DomainTests.CreateTests
         [Test]
         public void CreateCommandHandlerOnSucessHasValidSettingsFile()
         {
+            // TODO: validate actual JSON content - not just that the file exists.
             var mockFileSystem = new MockFileSystem();
             mockFileSystem.AddDirectory(Environment.CurrentDirectory);
 
-            var mockLogger = new Mock<ILogger>();
+            var globalTuple = MockFileSystemHelper.GetGlobalTemplateMock();
+            mockFileSystem.AddFile(globalTuple.Item1, globalTuple.Item2);
+
+            var localTuple = MockFileSystemHelper.GetLocalTemplateMock();
+            mockFileSystem.AddFile(localTuple.Item1, localTuple.Item2);
+
+            var configComposer = new ConfigComposer(mockFileSystem);
+            var contentComposer = new ContentComposer(mockFileSystem);
 
             var handler = new CreateCommandHandler(
-                _mockTerminal.Object,
+                configComposer,
+                contentComposer,
                 mockFileSystem,
-                mockLogger.Object);
+                _mockTerminal.Object,
+                _mockGlobalLogger.Object);
 
             const string projectName = "MyUnitTestProject";
 
@@ -93,7 +124,7 @@ namespace Sculptor.Tests.DomainTests.CreateTests
 
             Assert.True(mockFileSystem.File.Exists(mockFileSystem.Path.Combine(
                 projectRootPath,
-                "appsettings.json")));
+                "local-config.json")));
         }
 
         [Test]
@@ -102,12 +133,15 @@ namespace Sculptor.Tests.DomainTests.CreateTests
             var mockFileSystem = new MockFileSystem();
             mockFileSystem.AddDirectory(Environment.CurrentDirectory);
 
-            var mockLogger = new Mock<ILogger>();
+            var mockConfigComposer = new Mock<IConfigComposer>();
+            var mockContentComposer = new Mock<IContentComposer>();
 
             var handler = new CreateCommandHandler(
-                _mockTerminal.Object,
+                mockConfigComposer.Object,
+                mockContentComposer.Object,
                 mockFileSystem,
-                mockLogger.Object);
+                _mockTerminal.Object,
+                _mockGlobalLogger.Object);
 
             handler.Handle(new CreateCommand
             {

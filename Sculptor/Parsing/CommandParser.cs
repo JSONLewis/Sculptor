@@ -4,8 +4,8 @@ using Sculptor.Core;
 using Sculptor.Core.Domain;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.Infrastructure.Exceptions.ParserExceptions;
+using Sculptor.Infrastructure.Logging;
 using Sculptor.Infrastructure.OutputFormatters;
-using Serilog;
 
 namespace Sculptor.Parsing
 {
@@ -13,12 +13,12 @@ namespace Sculptor.Parsing
     {
         private readonly IOutputFormatter _outputFormatter;
         private readonly IRegisteredVerbs _registeredVerbs;
-        private readonly ILogger _logger;
+        private readonly IGlobalLogger _logger;
 
         public CommandParser(
             IOutputFormatter templateBuilder,
             IRegisteredVerbs registeredVerbs,
-            ILogger logger)
+            IGlobalLogger logger)
         {
             _outputFormatter = templateBuilder;
             _registeredVerbs = registeredVerbs;
@@ -27,7 +27,7 @@ namespace Sculptor.Parsing
 
         public ICommand Parse(IUserInput userInput)
         {
-            _logger.Information($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] called with the following parameter: {{@UserInput}}", userInput);
+            _logger.Instance.Information($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] called with the following parameter: {{@UserInput}}", userInput);
 
             var parserResult = Parser.Default.ParseArguments(
                 userInput.Arguments,
@@ -38,14 +38,14 @@ namespace Sculptor.Parsing
 
             if (parserResult.Tag == ParserResultType.NotParsed)
             {
-                _logger.Error($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] was unable to parse provided command: {{@UserInput}}", userInput);
+                _logger.Instance.Error($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] was unable to parse provided command: {{@UserInput}}", userInput);
                 return null;
             }
 
             if (!((parserResult as Parsed<object>)?.Value is ICommand command))
                 throw new SculptorParserException($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] could not find a valid implementation of {nameof(ICommand)} matching {{@UserInput}}", userInput);
 
-            _logger.Information($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] succesfully parsed: {{@UserInput}}", userInput);
+            _logger.Instance.Information($"[{nameof(CommandParser)}.{nameof(CommandParser.Parse)}] succesfully parsed: {{@UserInput}}", userInput);
 
             return command;
         }

@@ -17,6 +17,7 @@
   <ItemGroup>
     <Folder Include="DomainTests\" />
     <Folder Include="DomainTests\CreateTests\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sculptor.Core\Sculptor.Core.csproj" />

@@ -1,7 +1,7 @@
 ﻿using System;
 using Sculptor.Infrastructure.ConsoleAbstractions;
+using Sculptor.Infrastructure.Logging;
 using Sculptor.Infrastructure.OutputFormatters;
-using Serilog;
 
 namespace Sculptor.Infrastructure.Exceptions
 {
@@ -9,12 +9,12 @@ namespace Sculptor.Infrastructure.Exceptions
     {
         private readonly IOutputFormatter _outputFormatter;
         private readonly ITerminal _terminal;
-        private readonly ILogger _logger;
+        private readonly IGlobalLogger _logger;
 
         public ExceptionHandler(
             IOutputFormatter outputFormatter,
             ITerminal terminal,
-            ILogger logger)
+            IGlobalLogger logger)
         {
             _outputFormatter = outputFormatter;
             _terminal = terminal;
@@ -28,7 +28,7 @@ namespace Sculptor.Infrastructure.Exceptions
             string template = _outputFormatter.FormatMessageForOutput(errorMessage);
 
             _terminal.RenderText(template);
-            _logger.Error(exception, errorMessage);
+            _logger.Instance.Error(exception, errorMessage);
         }
     }
 }
