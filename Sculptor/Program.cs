@@ -1,7 +1,5 @@
 ﻿using System;
-using Sculptor.Infrastructure.Configuration;
 using Sculptor.Infrastructure.ConsoleAbstractions;
-using Sculptor.Infrastructure.Logging;
 
 namespace Sculptor
 {
@@ -9,6 +7,12 @@ namespace Sculptor
     {
         private static void Main(string[] args)
         {
+#if DEBUG
+            // For the sake of debugging commands that will be invoked in project
+            // directories (such as launching the web server) set the value here to
+            // match the folder created under the bin folder as appropriate.
+            // Environment.CurrentDirectory = Path.Combine(Environment.CurrentDirectory, "MyFirstProject");
+#endif
             var commandScope = GetCommandScope(args);
 
             try
@@ -27,26 +31,7 @@ namespace Sculptor
 
             var app = Bootstrapper.GetInstance<IApplication>();
 
-            try
-            {
-#if DEBUG
-                // For the sake of debugging commands that will be invoked in project
-                // directories (such as launching the web server) set the value here to
-                // match the folder created under the bin folder as appropriate.
-                // Environment.CurrentDirectory = Path.Combine(Environment.CurrentDirectory, "MyFirstProject");
-#endif
-                app.Run(userInput);
-            }
-            catch (Exception e)
-            {
-                var logger = Bootstrapper.GetInstance<IGlobalLogger>();
-                logger.Instance.Fatal($"[{nameof(Program)}.{nameof(Program.Main)}] encountered an unexpected, unrecoverable exception and had to terminate. The following exception was captured: {{@Exception}}", e);
-
-                var terminal = Bootstrapper.GetInstance<ITerminal>();
-                var configuration = Bootstrapper.GetInstance<IGlobalConfiguration>();
-
-                terminal.RenderText($"[{nameof(Program)}.{nameof(Program.Main)}] encountered an unrecoverable error. Check the latest log at `{configuration.LogDirectoryPath}` for full details");
-            }
+            app.Run(userInput);
         }
 
         /// <summary>

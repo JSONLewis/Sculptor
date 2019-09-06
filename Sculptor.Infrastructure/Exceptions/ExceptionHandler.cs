@@ -28,7 +28,7 @@ namespace Sculptor.Infrastructure.Exceptions
             string template = _outputFormatter.FormatMessageForOutput(errorMessage);
 
             _terminal.RenderText(template);
-            _logger.Instance.Error(exception, errorMessage);
+            _logger.Instance.Fatal(exception, errorMessage);
         }
     }
 }

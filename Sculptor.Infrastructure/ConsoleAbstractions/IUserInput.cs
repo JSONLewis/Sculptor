@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Sculptor.Infrastructure.ConsoleAbstractions
 {
@@ -8,7 +7,5 @@ namespace Sculptor.Infrastructure.ConsoleAbstractions
         string Raw { get; }
 
         ICollection<string> Arguments { get; set; }
-
-        DateTime SubmittedOn { get; }
     }
 }

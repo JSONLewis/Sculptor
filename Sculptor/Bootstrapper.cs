@@ -2,6 +2,7 @@
 using System.IO.Abstractions;
 using FluentValidation;
 using Sculptor.Core;
+using Sculptor.Core.CrossCuttingConcerns;
 using Sculptor.Core.Domain;
 using Sculptor.Core.Domain.Create;
 using Sculptor.Infrastructure;
@@ -58,9 +59,15 @@ namespace Sculptor
             _container.Register(typeof(ICommandHandler<>), assemblies);
 
             // Note: that the order of registration is significant for decorators as each
-            // successive rule for a given type is wrapped by the previous.
+            // successive rule wraps the one before it.
             _container.RegisterDecorator(typeof(ICommandHandler<>),
                 typeof(ValidationCommandHandlerDecorator<>));
+
+            _container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(AuditCommandHandlerDecorator<>));
+
+            _container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(ExceptionCommandHandlerDecorator<>));
 
             _container.Verify();
         }

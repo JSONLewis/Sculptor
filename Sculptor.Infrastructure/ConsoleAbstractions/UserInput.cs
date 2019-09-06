@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Sculptor.Infrastructure.ConsoleAbstractions
 {
-    public class UserInput : IUserInput
+    public sealed class UserInput : IUserInput
     {
-        public UserInput()
-        {
-            SubmittedOn = DateTime.UtcNow;
-        }
-
         public string Raw { get { return string.Join(' ', Arguments); } }
 
         public ICollection<string> Arguments { get; set; }
-
-        public DateTime SubmittedOn { get; }
     }
 }

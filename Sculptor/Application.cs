@@ -1,9 +1,8 @@
 ﻿using System;
 using Sculptor.Infrastructure;
+using Sculptor.Infrastructure.Configuration;
 using Sculptor.Infrastructure.ConsoleAbstractions;
-using Sculptor.Infrastructure.Exceptions;
-using Sculptor.Infrastructure.Exceptions.ParserExceptions;
-using Sculptor.Infrastructure.Exceptions.ValidationExceptions;
+using Sculptor.Infrastructure.Logging;
 using Sculptor.Parsing;
 
 namespace Sculptor
@@ -12,45 +11,42 @@ namespace Sculptor
     {
         private readonly ICommandParser _commandParser;
         private readonly ICommandProcessor _commandProcessor;
-        private readonly IExceptionHandler _exceptionHandler;
+        private readonly IGlobalLogger _globalLogger;
+        private readonly IGlobalConfiguration _globalConfiguration;
+        private readonly ITerminal _terminal;
 
         public Application(
             ICommandParser commandParser,
             ICommandProcessor commandProcessor,
-            IExceptionHandler exceptionHandler)
+            IGlobalLogger globalLogger,
+            IGlobalConfiguration globalConfiguration,
+            ITerminal terminal)
         {
             _commandParser = commandParser;
             _commandProcessor = commandProcessor;
-            _exceptionHandler = exceptionHandler;
+            _globalLogger = globalLogger;
+            _globalConfiguration = globalConfiguration;
+            _terminal = terminal;
         }
 
         public void Run(IUserInput userInput)
         {
+            var parserResult = _commandParser.Parse(userInput);
+
+            // A null or otherwise failed parse attempt internally handles informing the
+            // user of what went wrong, so we can just exit.
+            if (parserResult is null)
+                return;
+
             try
             {
-                var parserResult = _commandParser.Parse(userInput);
-
-                if (parserResult is null == false)
-                {
-                    _commandProcessor.Process(parserResult);
-                }
+                _commandProcessor.Process(parserResult);
             }
-            catch (Exception e) when (e is IFormattableException)
+            catch (Exception ex)
             {
-                // NOTE: it would be far better not to have to switch on the type of
-                // exception, but the compiler is not smart enough (even when we check
-                // explicitly) to not require some form of casting.
-                switch (e)
-                {
-                    case SculptorParserException ex:
-                        _exceptionHandler.Handle(ex);
-                        break;
-                    case SculptorValidationException ex:
-                        _exceptionHandler.Handle(ex);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"[{nameof(Application)}.{nameof(Application.Run)}] encountered a custom {nameof(IFormattableException)} but it was not handled", e);
-                }
+                _globalLogger.Instance.Fatal($"[{nameof(Application)}.{nameof(Application.Run)}] encountered an unrecoverable error and had to terminate. The following exception was captured: {{@Exception}}", ex);
+
+                _terminal.RenderText($"[{nameof(Application)}.{nameof(Application.Run)}] encountered an unrecoverable error. Check the latest log at `{_globalConfiguration.LogDirectoryPath}` for full details");
             }
         }
     }

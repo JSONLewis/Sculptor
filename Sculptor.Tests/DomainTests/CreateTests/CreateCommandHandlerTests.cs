@@ -5,16 +5,13 @@ using NUnit.Framework;
 using Sculptor.Core;
 using Sculptor.Core.Domain.Create;
 using Sculptor.Infrastructure.ConsoleAbstractions;
-using Sculptor.Infrastructure.Logging;
 using Sculptor.Tests.Helpers;
-using Serilog;
 
 namespace Sculptor.Tests.DomainTests.CreateTests
 {
     public class CreateCommandHandlerTests
     {
         private Mock<ITerminal> _mockTerminal;
-        private Mock<IGlobalLogger> _mockGlobalLogger;
 
         #region Setup
 
@@ -23,15 +20,6 @@ namespace Sculptor.Tests.DomainTests.CreateTests
         {
             _mockTerminal = new Mock<ITerminal>();
             _mockTerminal.Setup(x => x.RenderText(It.IsAny<string>()));
-
-            var logger = new Mock<ILogger>();
-
-            _mockGlobalLogger = new Mock<IGlobalLogger>();
-
-            // TODO: write test for verifying expected methods called on error etc.
-            _mockGlobalLogger
-                .Setup(x => x.Instance)
-                .Returns(new GlobalLogger(logger.Object).Instance);
         }
 
         #endregion Setup
@@ -55,8 +43,7 @@ namespace Sculptor.Tests.DomainTests.CreateTests
                 configComposer,
                 contentComposer,
                 mockFileSystem,
-                _mockTerminal.Object,
-                _mockGlobalLogger.Object);
+                _mockTerminal.Object);
 
             const string projectName = "MyUnitTestProject";
             const string outputDirectoryName = "public";
@@ -107,8 +94,7 @@ namespace Sculptor.Tests.DomainTests.CreateTests
                 configComposer,
                 contentComposer,
                 mockFileSystem,
-                _mockTerminal.Object,
-                _mockGlobalLogger.Object);
+                _mockTerminal.Object);
 
             const string projectName = "MyUnitTestProject";
 
@@ -140,8 +126,7 @@ namespace Sculptor.Tests.DomainTests.CreateTests
                 mockConfigComposer.Object,
                 mockContentComposer.Object,
                 mockFileSystem,
-                _mockTerminal.Object,
-                _mockGlobalLogger.Object);
+                _mockTerminal.Object);
 
             handler.Handle(new CreateCommand
             {

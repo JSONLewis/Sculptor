@@ -2,7 +2,7 @@
 using Sculptor.Core.Domain;
 using Sculptor.Infrastructure.Exceptions.ValidationExceptions;
 
-namespace Sculptor.Core
+namespace Sculptor.Core.CrossCuttingConcerns
 {
     /// <summary>
     /// This decorator wraps every command handler so that we can consistently run the
