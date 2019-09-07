@@ -1,5 +1,5 @@
-﻿using System.IO.Abstractions.TestingHelpers;
-using Sculptor.Infrastructure;
+﻿using Sculptor.Infrastructure;
+using System.IO.Abstractions.TestingHelpers;
 
 namespace Sculptor.Tests.Helpers
 {

@@ -1,9 +1,9 @@
-﻿using System;
-using Sculptor.Infrastructure;
+﻿using Sculptor.Infrastructure;
 using Sculptor.Infrastructure.Configuration;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.Infrastructure.Logging;
 using Sculptor.Parsing;
+using System;
 
 namespace Sculptor
 {

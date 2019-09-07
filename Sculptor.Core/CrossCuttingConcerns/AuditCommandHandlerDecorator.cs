@@ -1,7 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using Sculptor.Core.Domain;
+﻿using Sculptor.Core.Domain;
 using Sculptor.Infrastructure.Logging;
+using System;
+using System.Diagnostics;
 
 namespace Sculptor.Core.CrossCuttingConcerns
 {

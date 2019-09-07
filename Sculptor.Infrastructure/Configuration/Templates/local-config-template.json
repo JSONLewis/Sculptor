@@ -1,22 +1,22 @@
 ﻿{
-    "Sculptor": {
-        "Configuration": {
-            "OutputPath": "<<OUTPUT_PATH>>",
-            "ProjectName": "<<PROJECT_NAME>>"
-        }
-    },
-    "Serilog": {
-        "MinimumLevel": "Verbose",
-        "WriteTo": [
-            {
-                "Name": "RollingFile",
-                "Args": {
-                    "pathFormat": "<<LOCAL_PATH_FORMAT>>",
-                    "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
-                    "fileSizeLimitBytes": 2147483648,
-                    "retainedFileCountLimit": 5
-                }
-            }
-        ]
+  "Sculptor": {
+    "Configuration": {
+      "OutputPath": "<<OUTPUT_PATH>>",
+      "ProjectName": "<<PROJECT_NAME>>"
     }
+  },
+  "Serilog": {
+    "MinimumLevel": "Verbose",
+    "WriteTo": [
+      {
+        "Name": "RollingFile",
+        "Args": {
+          "pathFormat": "<<LOCAL_PATH_FORMAT>>",
+          "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
+          "fileSizeLimitBytes": 2147483648,
+          "retainedFileCountLimit": 5
+        }
+      }
+    ]
+  }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO.Abstractions;
-using FluentValidation;
+﻿using FluentValidation;
 using Sculptor.Core;
 using Sculptor.Core.CrossCuttingConcerns;
 using Sculptor.Core.Domain;
@@ -13,6 +11,8 @@ using Sculptor.Infrastructure.Logging;
 using Sculptor.Infrastructure.OutputFormatters;
 using Sculptor.Parsing;
 using SimpleInjector;
+using System;
+using System.IO.Abstractions;
 
 namespace Sculptor
 {

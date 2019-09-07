@@ -1,5 +1,5 @@
-﻿using System;
-using Sculptor.Infrastructure.ConsoleAbstractions;
+﻿using Sculptor.Infrastructure.ConsoleAbstractions;
+using System;
 
 namespace Sculptor
 {
@@ -51,7 +51,7 @@ namespace Sculptor
         }
     }
 
-    enum CommandScope
+    internal enum CommandScope
     {
         Global,
         Local

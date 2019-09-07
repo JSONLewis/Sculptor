@@ -1,7 +1,7 @@
-﻿using System;
-using Sculptor.Infrastructure.ConsoleAbstractions;
+﻿using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.Infrastructure.Logging;
 using Sculptor.Infrastructure.OutputFormatters;
+using System;
 
 namespace Sculptor.Infrastructure.Exceptions
 {

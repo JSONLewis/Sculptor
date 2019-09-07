@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Sculptor.Infrastructure.ConsoleAbstractions;
+using System;
 using System.IO.Abstractions;
-using Sculptor.Infrastructure.ConsoleAbstractions;
 
 namespace Sculptor.Core.Domain.Create
 {

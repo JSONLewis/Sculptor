@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Sculptor.Infrastructure;
+using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Text;
-using Sculptor.Infrastructure;
 
 namespace Sculptor.Core.Domain.Create
 {

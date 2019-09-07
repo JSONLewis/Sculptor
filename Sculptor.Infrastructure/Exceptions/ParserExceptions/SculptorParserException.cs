@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Sculptor.Infrastructure.Exceptions.ParserExceptions
 {
     /// <summary>

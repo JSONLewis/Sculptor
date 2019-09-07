@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.IO.Abstractions;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 
 // TODO: wrap this in another layer that verifies the configuration we get back is valid.
 namespace Sculptor.Infrastructure.Configuration
@@ -26,9 +26,11 @@ namespace Sculptor.Infrastructure.Configuration
                 case nameof(GlobalConfiguration):
                     BuildGlobalConfig(builder);
                     break;
+
                 case nameof(LocalConfiguration):
                     BuildLocalConfig(builder);
                     break;
+
                 default:
                     throw new NotSupportedException($"[{nameof(ConfigurationResolver)}.{nameof(ConfigurationResolver.BuildConfiguration)}] encountered an unknown configuration type.");
             }

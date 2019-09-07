@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sculptor.Infrastructure.Exceptions.ValidationExceptions
 {

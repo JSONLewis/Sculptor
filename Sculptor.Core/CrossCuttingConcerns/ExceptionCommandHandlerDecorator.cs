@@ -1,8 +1,8 @@
-﻿using System;
-using Sculptor.Core.Domain;
+﻿using Sculptor.Core.Domain;
 using Sculptor.Infrastructure.Exceptions;
 using Sculptor.Infrastructure.Exceptions.ParserExceptions;
 using Sculptor.Infrastructure.Exceptions.ValidationExceptions;
+using System;
 
 namespace Sculptor.Core.CrossCuttingConcerns
 {
@@ -33,9 +33,11 @@ namespace Sculptor.Core.CrossCuttingConcerns
                     case SculptorParserException exp:
                         _exceptionHandler.Handle(exp);
                         break;
+
                     case SculptorValidationException exv:
                         _exceptionHandler.Handle(exv);
                         break;
+
                     default:
                         throw new InvalidOperationException($"[{nameof(ExceptionCommandHandlerDecorator<TCommand>)}.{nameof(ExceptionCommandHandlerDecorator<TCommand>.Handle)}] encountered a custom {nameof(IFormattableException)} but it was not handled", ex);
                 }

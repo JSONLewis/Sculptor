@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO.Abstractions.TestingHelpers;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Sculptor.Core;
 using Sculptor.Core.Domain.Create;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.Tests.Helpers;
+using System;
+using System.IO.Abstractions.TestingHelpers;
 
 namespace Sculptor.Tests.DomainTests.CreateTests
 {
