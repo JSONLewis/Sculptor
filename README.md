@@ -10,6 +10,7 @@
 * `sculptor create -n` Invalid command with no value provided for the name
 * `sculptor create -n "MyFirstProject" -o "site" --invalidoption` Invalid command option / argument
 * `sculptor invalidverb -t` Invalid command / verb
+* `sculptor serve` Valid command for running in the root directory of a Sculptor project. Will start a Kestrel web server for hosting the static content available in the configured output path.
 
 For the purposes of debugging you can simply copy these into the Visual Studio arguments section in the Sculptor project settings. **Note:** that you will only need to copy the *arguments* from the snippets above - the `sculptor` part is uncessary.
 

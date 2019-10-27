@@ -38,7 +38,7 @@ namespace Sculptor.Core.Domain.Create
                 StringComparison.Ordinal);
 
             string localLogDirectory = _fileSystem.Path.Combine(
-                    Environment.CurrentDirectory,
+                    FilePathHelper.ExecutingDirectory,
                     projectName,
                     "log");
 
@@ -50,7 +50,7 @@ namespace Sculptor.Core.Domain.Create
 
             templateFileContent = templateFileContent.Replace(
                 "<<LOCAL_PATH_FORMAT>>",
-                localLogFile,
+                FilePathHelper.BuildPlatformIndependentPath(localLogFile),
                 StringComparison.Ordinal);
 
             string configFilePath = _fileSystem.Path.Combine(

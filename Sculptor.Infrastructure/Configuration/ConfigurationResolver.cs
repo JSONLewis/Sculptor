@@ -19,9 +19,7 @@ namespace Sculptor.Infrastructure.Configuration
         {
             var builder = new ConfigurationBuilder();
 
-            string typeName = typeof(TConfig).Name;
-
-            switch (typeName)
+            switch (typeof(TConfig).Name)
             {
                 case nameof(GlobalConfiguration):
                     BuildGlobalConfig(builder);
@@ -91,25 +89,19 @@ namespace Sculptor.Infrastructure.Configuration
 
         private void BuildLocalConfig(ConfigurationBuilder configurationBuilder)
         {
-            string projectRootPath = Environment.CurrentDirectory;
+            string localConfigFilePath = _fileSystem.Path.Combine(
+                FilePathHelper.ExecutingDirectory,
+                FilePathHelper.LocalConfigFileName);
+
+            if (!_fileSystem.File.Exists(localConfigFilePath))
+                return;
 
             configurationBuilder
-                .SetBasePath(projectRootPath)
+                .SetBasePath(FilePathHelper.ExecutingDirectory)
                 .AddJsonFile(
                     FilePathHelper.LocalConfigFileName,
                     optional: false,
                     reloadOnChange: false);
-
-            string localConfigFilePath = _fileSystem.Path.Combine(
-                Environment.CurrentDirectory,
-                FilePathHelper.LocalConfigFileName);
-
-            if (_fileSystem.File.Exists(localConfigFilePath))
-                return;
-
-            // No existing configuration. Create the necessary default directory.
-            _fileSystem.Directory.CreateDirectory(
-                _fileSystem.Path.Combine(projectRootPath, "log"));
         }
     }
 }

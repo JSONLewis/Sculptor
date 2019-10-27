@@ -1,0 +1,16 @@
+//{
+//  "profiles": {
+//    "Sculptor": {
+//      "commandName": "Project",
+//      "commandLineArgs": "create -n \"MyFirstProject\""
+//    }
+//  }
+//}
+{
+  "profiles": {
+    "Sculptor": {
+      "commandName": "Project",
+      "commandLineArgs": "serve"
+    }
+  }
+}

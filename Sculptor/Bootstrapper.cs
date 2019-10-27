@@ -8,11 +8,14 @@ using Sculptor.Infrastructure.Configuration;
 using Sculptor.Infrastructure.ConsoleAbstractions;
 using Sculptor.Infrastructure.Exceptions;
 using Sculptor.Infrastructure.Logging;
+using Sculptor.Infrastructure.Markers;
 using Sculptor.Infrastructure.OutputFormatters;
 using Sculptor.Parsing;
+using Sculptor.Server;
 using SimpleInjector;
 using System;
 using System.IO.Abstractions;
+using System.Linq;
 
 namespace Sculptor
 {
@@ -25,10 +28,10 @@ namespace Sculptor
             _container = new Container();
         }
 
-        public static void InitialiseApplication(CommandScope commandScope)
+        public static void InitialiseApplication()
         {
             var fileSystem = new FileSystem();
-            BuildInfrastructure(fileSystem, commandScope);
+            BuildInfrastructure(fileSystem);
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             _container.Register(typeof(IValidator<>), assemblies);
@@ -58,10 +61,13 @@ namespace Sculptor
 
             _container.Register(typeof(ICommandHandler<>), assemblies);
 
+            _container.Register<IWebServer, KestrelWebServer>();
+
             // Note: that the order of registration is significant for decorators as each
             // successive rule wraps the one before it.
             _container.RegisterDecorator(typeof(ICommandHandler<>),
-                typeof(ValidationCommandHandlerDecorator<>));
+                typeof(ValidationCommandHandlerDecorator<>),
+                context => ShouldApplyValidationDecorator(context.ServiceType));
 
             _container.RegisterDecorator(typeof(ICommandHandler<>),
                 typeof(AuditCommandHandlerDecorator<>));
@@ -88,7 +94,7 @@ namespace Sculptor
         /// <summary>
         /// Registers the co-dependent configuration and logging dependencies.
         /// </summary>
-        private static void BuildInfrastructure(FileSystem fileSystem, CommandScope commandType)
+        private static void BuildInfrastructure(FileSystem fileSystem)
         {
             var configurationResolver = new ConfigurationResolver(fileSystem);
 
@@ -101,17 +107,34 @@ namespace Sculptor
             _container.RegisterSingleton<IGlobalLogger>(
                () => new GlobalLogger(globalConfig.AddLogging()));
 
-            if (commandType == CommandScope.Local)
-            {
-                var localConfig = configurationResolver
-                .BuildConfiguration<LocalConfiguration>();
+            var localConfig = configurationResolver
+            .BuildConfiguration<LocalConfiguration>();
 
-                _container.RegisterSingleton<ILocalConfiguration>(
-                    () => new LocalConfiguration(localConfig));
+            _container.RegisterSingleton<ILocalConfiguration>(
+                () => new LocalConfiguration(localConfig));
 
-                _container.RegisterSingleton<ILocalLogger>(
-                () => new LocalLogger(localConfig.AddLogging()));
-            }
+            _container.RegisterSingleton<ILocalLogger>(
+            () => new LocalLogger(localConfig.AddLogging()));
+        }
+
+        /// <summary>
+        /// For a given type that implements <see cref="ICommandHandler{TCommand}"/>
+        /// check to see if its TCommand has a marker interface of
+        /// <see cref="IExcludeFromValidation"/>.
+        /// </summary>
+        /// <param name="serviceType">The concrete command handler to verify.</param>
+        /// <returns>
+        /// Boolean: where true signifies that this service type will be decorated by
+        /// <see cref="ValidationCommandHandlerDecorator{TCommand}"/>.
+        /// </returns>
+        private static bool ShouldApplyValidationDecorator(Type serviceType)
+        {
+            bool preventDecoration = serviceType
+                .GenericTypeArguments[0]
+                .GetInterfaces()
+                .Any(type => type == typeof(IExcludeFromValidation));
+
+            return !preventDecoration;
         }
 
         #endregion Helpers

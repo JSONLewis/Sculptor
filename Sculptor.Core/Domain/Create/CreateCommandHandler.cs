@@ -1,5 +1,5 @@
-﻿using Sculptor.Infrastructure.ConsoleAbstractions;
-using System;
+﻿using Sculptor.Infrastructure;
+using Sculptor.Infrastructure.ConsoleAbstractions;
 using System.IO.Abstractions;
 
 namespace Sculptor.Core.Domain.Create
@@ -26,7 +26,7 @@ namespace Sculptor.Core.Domain.Create
         public void Handle(CreateCommand command)
         {
             string projectRootPath = _fileSystem.Path.Combine(
-                Environment.CurrentDirectory,
+                FilePathHelper.ExecutingDirectory,
                 command.ProjectName);
 
             string outputPath = _fileSystem.Path.Combine(

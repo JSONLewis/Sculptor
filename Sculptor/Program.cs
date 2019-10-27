@@ -7,17 +7,11 @@ namespace Sculptor
     {
         private static void Main(string[] args)
         {
-#if DEBUG
-            // For the sake of debugging commands that will be invoked in project
-            // directories (such as launching the web server) set the value here to
-            // match the folder created under the bin folder as appropriate.
-            // Environment.CurrentDirectory = Path.Combine(Environment.CurrentDirectory, "MyFirstProject");
-#endif
-            var commandScope = GetCommandScope(args);
+            SetCommandScope(args);
 
             try
             {
-                Bootstrapper.InitialiseApplication(commandScope);
+                Bootstrapper.InitialiseApplication();
             }
             catch (Exception ex)
             {
@@ -39,21 +33,22 @@ namespace Sculptor
         /// (local scope) or one that can be invoked anywhere (global).
         /// </summary>
         /// <param name="args"></param>
-        /// <returns></returns>
-        private static CommandScope GetCommandScope(string[] args)
+        private static void SetCommandScope(string[] args)
         {
-            if (args.Length <= 0)
+#if DEBUG
+            if (args.Length == 0)
                 throw new NotSupportedException("Sculptor must be invoked with at least one verb");
 
-            return args[0].Equals("create", StringComparison.OrdinalIgnoreCase)
-                ? CommandScope.Global
-                : CommandScope.Local;
-        }
-    }
+            bool isLocalScope = !args[0].Equals("create", StringComparison.OrdinalIgnoreCase);
 
-    internal enum CommandScope
-    {
-        Global,
-        Local
+            if (isLocalScope)
+            {
+                // For the sake of debugging commands that will be invoked in project
+                // directories (such as launching the web server) set the value here to
+                // match the folder created under the bin folder as appropriate.
+                Infrastructure.FilePathHelper.ExecutingDirectory = System.IO.Path.Combine(Environment.CurrentDirectory, "MyFirstProject");
+            }
+#endif
+        }
     }
 }

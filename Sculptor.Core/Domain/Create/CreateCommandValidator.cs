@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Sculptor.Infrastructure;
 using System;
 using System.IO.Abstractions;
 
@@ -40,7 +41,7 @@ namespace Sculptor.Core.Domain.Create
 
         private bool IsValidProjectLocation(string projectName)
         {
-            string projectRootPath = _fileSystem.Path.Combine(Environment.CurrentDirectory, projectName);
+            string projectRootPath = _fileSystem.Path.Combine(FilePathHelper.ExecutingDirectory, projectName);
             return !_fileSystem.Directory.Exists(projectRootPath);
         }
 
