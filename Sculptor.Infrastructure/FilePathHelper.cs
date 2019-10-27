@@ -14,6 +14,8 @@ namespace Sculptor.Infrastructure
         public static string ExecutingDirectory = Path
             .GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+        public static string CurrentDirectory = Directory.GetCurrentDirectory();
+
         /// <summary>
         /// Any path written to a config file needs to be written in a way that works on
         /// Windows, Linux, and OSX. To ensure that we're consistent and don't have to
@@ -21,7 +23,6 @@ namespace Sculptor.Infrastructure
         /// separator on all platforms.
         /// </summary>
         /// <param name="path">The path to be made platform independent.</param>
-        /// <returns></returns>
         public static string BuildPlatformIndependentPath(string path)
         {
             return path.Replace(
@@ -33,7 +34,6 @@ namespace Sculptor.Infrastructure
         /// Formats the provided file name as a path pointing to the template directory.
         /// </summary>
         /// <param name="fileName"></param>
-        /// <returns></returns>
         public static string GetTemplatePath(string fileName)
         {
             return Path.Combine(ExecutingDirectory, "Configuration", "Templates", fileName);

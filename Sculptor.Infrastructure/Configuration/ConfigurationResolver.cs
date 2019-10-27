@@ -90,14 +90,14 @@ namespace Sculptor.Infrastructure.Configuration
         private void BuildLocalConfig(ConfigurationBuilder configurationBuilder)
         {
             string localConfigFilePath = _fileSystem.Path.Combine(
-                FilePathHelper.ExecutingDirectory,
+                FilePathHelper.CurrentDirectory,
                 FilePathHelper.LocalConfigFileName);
 
             if (!_fileSystem.File.Exists(localConfigFilePath))
                 return;
 
             configurationBuilder
-                .SetBasePath(FilePathHelper.ExecutingDirectory)
+                .SetBasePath(FilePathHelper.CurrentDirectory)
                 .AddJsonFile(
                     FilePathHelper.LocalConfigFileName,
                     optional: false,

@@ -38,7 +38,7 @@ namespace Sculptor.Core.Domain.Create
                 StringComparison.Ordinal);
 
             string localLogDirectory = _fileSystem.Path.Combine(
-                    FilePathHelper.ExecutingDirectory,
+                    FilePathHelper.CurrentDirectory,
                     projectName,
                     "log");
 

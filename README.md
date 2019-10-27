@@ -14,15 +14,17 @@
 
 For the purposes of debugging you can simply copy these into the Visual Studio arguments section in the Sculptor project settings. **Note:** that you will only need to copy the *arguments* from the snippets above - the `sculptor` part is uncessary.
 
-## Installation
+## Build and Install Sculptor
 
-### ZSH
+### Pre installation (ZSH only)
 Ensure that the `.dotnet/tools` directory is available on your path. Something like the following:
 
 ```bash
 cd ~/
 export PATH=/home/michael/.dotnet/tools:$PATH
 ```
+
+### Installation
 
 Follow [this guide](https://marcstan.net/blog/2018/09/22/Global-tools-in-.Net-Core/) for getting a global tool installed from source.
 
@@ -31,10 +33,20 @@ You'll end up with something like the following:
 ```bash
 cd ~/{Source_Code_Directory}/Sculptor/
 dotnet pack Sculptor.csproj -c Release
-dotnet tool install --global sculptor --add-source ./
+dotnet tool install --global sculptor --add-source .\bin\Release\
 ```
 
-_Note:_ the `--add-source ./` argument must refer to the directory that contains the nuget package - **not the file itself.**
+You can also update your local installation easily enough with a similarly formatted command:
+
+```bash
+dotnet tool update --global sculptor --add-source .\bin\Release\
+```
+
+_Note:_ the `--add-source {path_argument}` section must refer to the directory that contains the nuget package - **not the file itself.** 
+
+> In future updates a proper build and release process will be defined so that the generated `.nupkg` file ends up somewhere other than the bin directory.
 
 ## TODO:
+* Finish writing the rest of the logic.
 * Look into acceptance / regression testing by running a full instance againts a known set of commands and output. Maybe comparing screenshots of the result or piping the output to verify?
+* Put together samples and benchmarks.

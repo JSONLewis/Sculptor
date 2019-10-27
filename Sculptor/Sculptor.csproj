@@ -1,8 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Nuget specific meta data -->
+    <authors>Michael Searson</authors>
+    <owners>Michael Searson</owners>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- 
+      Friendly alias for the program (this is the exact name a user will invoke to use
+      the tool from a CLI of their choice) .
+    -->
+    <ToolCommandName>sculptor</ToolCommandName>
   </PropertyGroup>
 
   <ItemGroup>

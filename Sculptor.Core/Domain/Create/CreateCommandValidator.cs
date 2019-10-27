@@ -41,7 +41,7 @@ namespace Sculptor.Core.Domain.Create
 
         private bool IsValidProjectLocation(string projectName)
         {
-            string projectRootPath = _fileSystem.Path.Combine(FilePathHelper.ExecutingDirectory, projectName);
+            string projectRootPath = _fileSystem.Path.Combine(FilePathHelper.CurrentDirectory, projectName);
             return !_fileSystem.Directory.Exists(projectRootPath);
         }
 

@@ -46,7 +46,7 @@ namespace Sculptor
                 // For the sake of debugging commands that will be invoked in project
                 // directories (such as launching the web server) set the value here to
                 // match the folder created under the bin folder as appropriate.
-                Infrastructure.FilePathHelper.ExecutingDirectory = System.IO.Path.Combine(Environment.CurrentDirectory, "MyFirstProject");
+                Infrastructure.FilePathHelper.CurrentDirectory = System.IO.Path.Combine(Environment.CurrentDirectory, "MyFirstProject");
             }
 #endif
         }

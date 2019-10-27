@@ -26,7 +26,7 @@ namespace Sculptor.Core.Domain.Create
         public void Handle(CreateCommand command)
         {
             string projectRootPath = _fileSystem.Path.Combine(
-                FilePathHelper.ExecutingDirectory,
+                FilePathHelper.CurrentDirectory,
                 command.ProjectName);
 
             string outputPath = _fileSystem.Path.Combine(
